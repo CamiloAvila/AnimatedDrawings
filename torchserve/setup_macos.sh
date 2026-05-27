@@ -23,8 +23,20 @@ mim install mmcv-full==1.7.0
 
 echo "*** Downloading models"
 mkdir -p ./model-store
-wget https://github.com/facebookresearch/AnimatedDrawings/releases/download/v0.0.1/drawn_humanoid_detector.mar -P ./model-store/
-wget https://github.com/facebookresearch/AnimatedDrawings/releases/download/v0.0.1/drawn_humanoid_pose_estimator.mar -P ./model-store/
+
+download_file() {
+    local url=$1
+    local out_dir=$2
+    local filename=$(basename "$url")
+    if command -v wget &> /dev/null; then
+        wget "$url" -P "$out_dir/"
+    else
+        curl -L "$url" -o "$out_dir/$filename"
+    fi
+}
+
+download_file "https://github.com/facebookresearch/AnimatedDrawings/releases/download/v0.0.1/drawn_humanoid_detector.mar" "./model-store"
+download_file "https://github.com/facebookresearch/AnimatedDrawings/releases/download/v0.0.1/drawn_humanoid_pose_estimator.mar" "./model-store"
 
 echo "*** Now run torchserve:"
 echo "torchserve --start --ts-config config.local.properties --foreground"
